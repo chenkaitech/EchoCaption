@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title id="title-el"
+  data-en="EchoCaption · Offline Subtitle Maker"
+  data-zh="EchoCaption · 本地字幕生成器">EchoCaption · Offline Subtitle Maker</title>
+
+<meta name="description" id="meta-desc"
+  data-en="EchoCaption turns audio or video into subtitles on device. Import files via Share Extension, transcribe with a Whisper-based engine, preview with synced playback, and export SRT/VTT or plain text."
+  data-zh="EchoCaption 可在本地将音频/视频转成字幕。支持分享扩展快速导入，基于 Whisper 方案转录，同步播放预览字幕，并导出 SRT/VTT 或纯文本。"
+  content="EchoCaption turns audio or video into subtitles on device. Import files via Share Extension, transcribe with a Whisper-based engine, preview with synced playback, and export SRT/VTT or plain text.">
+
+<link rel="icon" href="echocaption_128.png">
+
+<style>
+:root{
+  /* EchoCaption 深色主题 */
+  --bg:#050712; 
+  --surface:#111525; 
+  --text:#F5F7FF; 
+  --text2:#B9C3DA;
+
+  --accent:#6EE7FF;
+  --accent2:#4F8CFF;
+
+  --chip:#1B2238; 
+  --chip2:#1A2036;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Helvetica, Arial, 
+  Noto Sans, "PingFang SC", "Hiragino Sans GB", "Microsoft Yahei", sans-serif;
+}
+a{color:var(--accent);text-decoration:none}
+.container{max-width:1100px;margin:0 auto;padding:40px 24px}
+nav{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:700}
+.brand img.icon{width:40px;height:40px;border-radius:12px}
+.lang-switch{display:flex;gap:8px;background:var(--surface);border-radius:12px;padding:6px}
+.lang-switch button{all:unset;cursor:pointer;padding:6px 14px;border-radius:10px;color:var(--text2);font-weight:600}
+.lang-switch button.active{background:var(--accent);color:#0B1220}
+.nav-links{display:flex;gap:18px;align-items:center}
+.nav-links a{color:var(--text2);font-weight:600}
+.nav-links a:hover{color:var(--text)}
+
+.hero{display:grid;grid-template-columns:1.1fr 0.9fr;gap:36px;align-items:center;margin-top:40px}
+.hero h1{font-size:40px;line-height:1.1;margin:0 0 16px}
+.hero p.lead{color:var(--text2);font-size:18px;margin:0 0 24px}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.button{
+  display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(180deg,var(--accent),var(--accent2));
+  color:#0B1220;font-weight:700;padding:14px 22px;border-radius:14px;
+  box-shadow:0 10px 30px rgba(79,140,255,.25);
+} 
+.button.ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.15)}
+.card{background:var(--surface);border-radius:20px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.25);} 
+.section{margin-top:80px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}
+.tag{
+  display:inline-block;padding:6px 10px;border-radius:8px;font-size:13px;
+  background:rgba(110,231,255,.16);color:#CFF8FF
+}
+.sample{width:100%;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.35);background:#0f1118;aspect-ratio:9/19.5;object-fit:cover}
+.footer{margin-top:80px;color:var(--text2);font-size:14px;border-top:1px solid rgba(255,255,255,.08);padding:32px 0}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.gallery img{
+  width:100%;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.35);
+  background:#0f1118;aspect-ratio:9/19.5;object-fit:cover
+}
+/* 竖屏图比例 */
+.gallery img.portrait { aspect-ratio: 9 / 19.5; }
+/* 横屏图比例 (iPad & 平板横屏) */
+.gallery img.landscape { aspect-ratio: 16 / 10; }
+@media (max-width:960px){ .hero{grid-template-columns:1fr} }
+
+/* 英雄区：EchoCaption UI 示意卡片 */
+.pn-card{border-radius:18px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.35);background:#0F1528}
+.pn-top{
+  padding:22px 22px 10px;color:#CFF8FF;font-weight:800;letter-spacing:.04em
+}
+.pn-body{
+  background:
+    radial-gradient(circle at 10% 0%,rgba(110,231,255,.35),rgba(110,231,255,0) 55%),
+    linear-gradient(180deg,#151A33,#070B18);
+  padding:22px
+}
+.pn-row{display:flex;align-items:center;gap:10px;margin:10px 0}
+.pn-avatar{
+  width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle at 30% 0%,#B9F6FF,#4F8CFF);
+  opacity:.9
+}
+.pn-line{
+  height:10px;border-radius:6px;background:rgba(255,255,255,.10);flex:1
+}
+.pn-line.bold{height:14px;background:rgba(255,255,255,.16);width:70%}
+.pn-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.06);
+  color:var(--text2);font-size:12px;font-weight:600
+}
+.pn-dots{display:flex;gap:6px}
+.pn-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.pn-bar{background:#0B0F1E;color:#E6F7FF;text-align:center;padding:12px;font-weight:700}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <nav>
+    <div class="brand">
+      <!-- 替换为 EchoCaption 图标 -->
+      <img class="icon" src="echocaption_128.png" alt="EchoCaption icon">
+      <span>
+        <span data-en="EchoCaption" data-zh="EchoCaption"></span> ·
+        <span data-en="Offline Subtitle Maker" data-zh="本地字幕生成器"></span>
+      </span>
+    </div>
+
+    <div class="nav-links">
+      <a href="#privacy" data-en="Privacy" data-zh="隐私"></a>
+      <a href="#support" data-en="Support" data-zh="支持"></a>
+    </div>
+
+    <div class="lang-switch">
+      <button id="btn-en" class="active">English</button>
+      <button id="btn-zh">中文</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div>
+      <h1
+        data-en="Turn audio & video into subtitles — on device."
+        data-zh="音频/视频一键转字幕，全程本地完成"></h1>
+
+      <p class="lead"
+         data-en="EchoCaption imports audio or video from Files, Photos, or Share Extension, transcribes with a Whisper-based engine, previews subtitles with synced playback, and exports SRT/VTT or plain text."
+         data-zh="EchoCaption 支持从文件/相册/分享扩展快速导入音频或视频，基于 Whisper 方案本地转录，同步播放预览字幕，并可导出 SRT/VTT 或纯文本。"></p>
+
+      <div class="cta">
+        <a href="#" class="button" data-en="Download on the App Store" data-zh="在 App Store 下载"></a>
+        <a href="#features" class="button ghost" data-en="See how it works" data-zh="了解功能"></a>
+      </div>
+
+      <div style="margin-top:24px;color:var(--text2)">
+        <span>• </span>
+        <span
+          data-en="On-device transcription · Synced playback · Export SRT/VTT · Share Extension import"
+          data-zh="本地转录 · 字幕联动播放 · 导出 SRT/VTT · 分享扩展导入"></span>
+      </div>
+    </div>
+
+    <div>
+      <!-- 英雄示意卡：EchoCaption UI -->
+      <div class="pn-card">
+        <div class="pn-top" data-en="EchoCaption · Ready" data-zh="EchoCaption · 就绪"></div>
+        <div class="pn-body">
+          <div class="pn-row">
+            <div class="pn-avatar"></div>
+            <div class="pn-line bold"></div>
+          </div>
+
+          <div class="pn-row">
+            <span class="pn-chip">
+              <span data-en="Import: Audio / Video" data-zh="导入：音频 / 视频"></span>
+            </span>
+            <span class="pn-chip">
+              <span data-en="Engine: On-device" data-zh="引擎：本地运行"></span>
+            </span>
+          </div>
+
+          <div class="pn-row">
+            <div class="pn-line" style="width:92%"></div>
+          </div>
+
+          <div class="pn-row">
+            <span class="pn-chip">
+              <span data-en="Playback: Synced Captions" data-zh="播放：字幕同步"></span>
+            </span>
+            <span class="pn-chip">
+              <span data-en="Export: SRT / VTT" data-zh="导出：SRT / VTT"></span>
+              <span class="pn-dots"><span class="pn-dot"></span><span class="pn-dot"></span></span>
+            </span>
+          </div>
+
+          <div class="pn-row">
+            <span class="pn-chip">
+              <span data-en="Share → Import in 1 tap" data-zh="分享 → 一键导入"></span>
+            </span>
+            <span class="pn-chip">
+              <span data-en="Privacy-first" data-zh="隐私优先"></span>
+            </span>
+          </div>
+        </div>
+
+        <div class="pn-bar"
+             data-en="Import → Transcribe → Export"
+             data-zh="导入 → 转录 → 导出"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="section">
+    <h2 data-en="Key features" data-zh="核心功能"></h2>
+    <div class="grid-3" style="margin-top:24px">
+
+      <!-- 本地转录 -->
+      <div class="card">
+        <div class="tag" data-en="Transcription" data-zh="转录"></div>
+        <h3 style="margin:12px 0"
+            data-en="On-device Speech-to-Text"
+            data-zh="本地语音转文字"></h3>
+        <p class="text2"
+           data-en="Transcribe audio and video with a Whisper-based engine on your device for privacy and speed."
+           data-zh="基于 Whisper 方案在端侧完成转录，兼顾隐私与速度。"></p>
+      </div>
+
+      <!-- 字幕联动播放 -->
+      <div class="card">
+        <div class="tag" data-en="Playback" data-zh="播放"></div>
+        <h3 style="margin:12px 0"
+            data-en="Synced subtitle preview"
+            data-zh="字幕同步播放预览"></h3>
+        <p class="text2"
+           data-en="Watch videos with captions aligned to the timeline for easy review and learning."
+           data-zh="字幕与时间轴联动播放，回看与学习更清晰。"></p>
+      </div>
+
+      <!-- 导出字幕 -->
+      <div class="card">
+        <div class="tag" data-en="Export" data-zh="导出"></div>
+        <h3 style="margin:12px 0"
+            data-en="Export SRT / VTT"
+            data-zh="导出 SRT / VTT"></h3>
+        <p class="text2"
+           data-en="Save subtitles as SRT/VTT or plain text for editing, sharing, or publishing."
+           data-zh="一键导出 SRT/VTT 或纯文本，便于剪辑、分享或发布。"></p>
+      </div>
+
+      <!-- 分享扩展导入 -->
+      <div class="card">
+        <div class="tag" data-en="Import" data-zh="导入"></div>
+        <h3 style="margin:12px 0"
+            data-en="Share Extension import"
+            data-zh="分享扩展快速导入"></h3>
+        <p class="text2"
+           data-en="Send files from Photos, Files, or other apps directly into EchoCaption."
+           data-zh="从相册/文件/其他 App 一键分享到 EchoCaption，快速开始转录。"></p>
+      </div>
+
+      <!-- 文件管理 -->
+      <div class="card">
+        <div class="tag" data-en="Library" data-zh="管理"></div>
+        <h3 style="margin:12px 0"
+            data-en="Organize in your library"
+            data-zh="素材库管理"></h3>
+        <p class="text2"
+           data-en="Keep your transcriptions in a clean library. Rename, group, and copy subtitles anytime."
+           data-zh="集中管理转录内容，支持重命名、分组与复制字幕。"></p>
+      </div>
+
+      <!-- 隐私 -->
+      <div class="card">
+        <div class="tag" style="background:rgba(255,255,255,.12);color:#fff"
+             data-en="Privacy" data-zh="隐私"></div>
+        <h3 style="margin:12px 0"
+            data-en="Privacy-first by design"
+            data-zh="隐私优先设计"></h3>
+        <p class="text2"
+           data-en="Transcription runs on your device. No account required. Your media stays with you."
+           data-zh="转录在本地运行，无需注册账号，音视频内容不离开设备。"></p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 data-en="Screenshots" data-zh="界面预览"></h2>
+    <p class="lead"
+       data-en="Replace the images below with real screenshots from EchoCaption."
+       data-zh="将下方占位图替换为 EchoCaption 的真实截图。"></p>
+    <div class="gallery" style="margin-top:16px">
+      <img class="landscape" src="ss_en_1.png" data-en-src="ss_en_1.png" data-zh-src="ss_zh_1.png" alt="EchoCaption screenshot 1">
+      <img class="landscape" src="ss_en_2.png" data-en-src="ss_en_2.png" data-zh-src="ss_zh_2.png" alt="EchoCaption screenshot 2">
+      <img class="landscape" src="ss_en_3.png" data-en-src="ss_en_3.png" data-zh-src="ss_zh_3.png" alt="EchoCaption screenshot 3">
+      <img class="landscape" src="ss_en_4.png" data-en-src="ss_en_4.png" data-zh-src="ss_zh_4.png" alt="EchoCaption screenshot 4">
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="grid-2">
+      <div class="card">
+        <h2 id="privacy" data-en="Privacy" data-zh="隐私"></h2>
+        <p class="text2"
+           data-en="EchoCaption is built with privacy in mind."
+           data-zh="EchoCaption 以隐私优先为设计原则。"></p>
+        <ul style="margin:12px 0 0 18px; color: var(--text2); line-height:1.7">
+          <li
+            data-en="No account required. Import and transcribe right away."
+            data-zh="无需注册账号，导入即可开始转录。"></li>
+          <li
+            data-en="Transcription runs on device whenever possible to keep your media private."
+            data-zh="转录尽可能在本地运行，保护你的内容隐私。"></li>
+          <li
+            data-en="Subtitles can be exported as SRT/VTT or plain text for your workflow."
+            data-zh="字幕可导出为 SRT/VTT 或纯文本，方便你的后续流程。"></li>
+          <li
+            data-en="Performance may vary by device and model settings."
+            data-zh="性能表现会因设备性能与模型设置不同而有所差异。"></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2 id="support" data-en="Support" data-zh="支持"></h2>
+        <p class="text2"
+           data-en="Questions or feedback about EchoCaption? Email us."
+           data-zh="关于 EchoCaption 的问题或建议，欢迎邮件联系。"></p>
+        <p><a href="mailto:freesysck@outlook.com">freesysck@outlook.com</a></p>
+        <p>
+          <a href="#" target="_blank" rel="noopener"
+             data-en="Marketing site" data-zh="营销网站"></a><br>
+          <a href="#" target="_blank" rel="noopener"
+             data-en="Privacy policy" data-zh="隐私政策"></a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="grid-2">
+      <div>
+        <strong>
+          <span data-en="EchoCaption" data-zh="EchoCaption"></span> ·
+          <span data-en="Offline Subtitle Maker" data-zh="本地字幕生成器"></span>
+        </strong><br>
+        <span
+          data-en="© 2026 EchoCaption. All rights reserved."
+          data-zh="© 2026 EchoCaption。保留所有权利。"></span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+function swapLangImages(lang){
+  document.querySelectorAll("img[data-en-src]").forEach(img=>{
+    const src = img.getAttribute(lang==="zh" ? "data-zh-src" : "data-en-src");
+    if(src) img.setAttribute("src", src);
+  });
+}
+function setLang(lang){
+  document.querySelectorAll("[data-en]").forEach(el=>{
+    const text = el.getAttribute(lang === "zh" ? "data-zh" : "data-en");
+    if(text!==null){ el.textContent = text; }
+  });
+  const titleEl = document.getElementById("title-el");
+  if(titleEl){
+    const t = titleEl.getAttribute(lang === "zh" ? "data-zh" : "data-en");
+    if(t) document.title = t;
+  }
+  const metaDesc = document.getElementById("meta-desc");
+  if(metaDesc){
+    const d = metaDesc.getAttribute(lang === "zh" ? "data-zh" : "data-en");
+    if(d) metaDesc.setAttribute("content", d);
+  }
+  swapLangImages(lang);
+  document.getElementById("btn-en").classList.toggle("active", lang==="en");
+  document.getElementById("btn-zh").classList.toggle("active", lang==="zh");
+  localStorage.setItem("EchoCaption-lang", lang);
+}
+document.getElementById("btn-en").onclick=()=>setLang("en");
+document.getElementById("btn-zh").onclick=()=>setLang("zh");
+const saved = localStorage.getItem("EchoCaption-lang") || (navigator.language.startsWith("zh")?"zh":"en");
+setLang(saved);
+</script>
+
+</body>
+</html>
